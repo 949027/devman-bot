@@ -6,16 +6,6 @@ import telegram
 import requests
 
 
-def send_message(token, chat_id, lesson_title, result, lesson_url):
-    bot = telegram.Bot(token=token)
-    text = 'Преподаватель проверил работу "{}"! {}. {}'.format(
-        lesson_title, result, lesson_url
-    )
-    bot.send_message(
-        chat_id=chat_id,
-        text=text)
-
-
 def main():
     load_dotenv()
     telegram_token = getenv('TELEGRAM_TOKEN')
