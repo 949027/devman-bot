@@ -1,4 +1,5 @@
 from os import getenv
+from time import sleep
 
 from dotenv import load_dotenv
 import telegram
@@ -36,7 +37,7 @@ def main():
         except requests.exceptions.ReadTimeout:
             continue
         except requests.exceptions.ConnectionError:
-            continue
+            sleep(60)
 
         server_message = response.json()
         timestamp = server_message.get('timestamp_to_request')
@@ -51,7 +52,6 @@ def main():
                     result = 'Работа не принята'
                 else:
                     result = 'Работа принята'
-                pprint(attempt)
                 send_message(
                     telegram_token, telegram_chat_id,
                     lesson_title, result, lesson_url
