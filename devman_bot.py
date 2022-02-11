@@ -26,6 +26,8 @@ def main():
     url = 'https://dvmn.org/api/long_polling/'
     timestamp = None
 
+    bot = telegram.Bot(token=telegram_token)
+
     while True:
         try:
             response = requests.get(
@@ -38,11 +40,12 @@ def main():
             continue
         except requests.exceptions.ConnectionError:
             sleep(60)
+            continue
 
         server_message = response.json()
-        timestamp = server_message.get('timestamp_to_request')
 
         if server_message['status'] == 'found':
+            timestamp = server_message.get('last_attempt_timestamp')
             attempts = server_message['new_attempts']
 
             for attempt in attempts:
@@ -52,10 +55,16 @@ def main():
                     result = 'Работа не принята'
                 else:
                     result = 'Работа принята'
-                send_message(
-                    telegram_token, telegram_chat_id,
+
+                text = 'Преподаватель проверил работу "{}"! {}. {}'.format(
                     lesson_title, result, lesson_url
                 )
+                bot.send_message(
+                    chat_id=telegram_chat_id,
+                    text=text)
+
+        elif server_message['status'] == 'timeout':
+            timestamp = server_message.get('timestamp_to_request')
 
 
 if __name__ == "__main__":
