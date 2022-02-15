@@ -1,3 +1,4 @@
+import logging
 from os import getenv
 from time import sleep
 
@@ -17,6 +18,8 @@ def main():
     timestamp = None
 
     bot = telegram.Bot(token=telegram_token)
+
+    logging.warning('Бот запущен')
 
     while True:
         try:
