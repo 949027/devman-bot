@@ -7,6 +7,18 @@ import telegram
 import requests
 
 
+class MyLogsHandler(logging.Handler):
+
+    def __init__(self, tg_bot, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.tg_bot = tg_bot
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+
+
 def main():
     load_dotenv()
     telegram_token = getenv('TELEGRAM_TOKEN')
@@ -19,19 +31,25 @@ def main():
 
     bot = telegram.Bot(token=telegram_token)
 
-    logging.warning('Бот запущен')
+    logger = logging.getLogger("Телеграм-логер")
+    logger.setLevel(logging.INFO)
+    logger.addHandler(MyLogsHandler(bot, telegram_chat_id))
+
+    logger.info('Бот запущен')
 
     while True:
         try:
             response = requests.get(
                 url,
                 headers=header,
-                params={'timestamp': timestamp}
+                params={'timestamp': timestamp},
             )
             response.raise_for_status()
         except requests.exceptions.ReadTimeout:
+            logger.warning('Истекло время ожидания ответа от сервера')
             continue
         except requests.exceptions.ConnectionError:
+            logger.warning('Потеряно соединение')
             sleep(60)
             continue
 
