@@ -39,44 +39,49 @@ def main():
 
     while True:
         try:
-            response = requests.get(
-                url,
-                headers=header,
-                params={'timestamp': timestamp},
-            )
-            response.raise_for_status()
-        except requests.exceptions.ReadTimeout:
-            logger.warning('Истекло время ожидания ответа от сервера')
-            continue
-        except requests.exceptions.ConnectionError:
-            logger.warning('Потеряно соединение')
-            sleep(60)
-            continue
-
-        server_message = response.json()
-
-        if server_message['status'] == 'found':
-            timestamp = server_message.get('last_attempt_timestamp')
-            attempts = server_message['new_attempts']
-
-            for attempt in attempts:
-                lesson_title = attempt['lesson_title']
-                lesson_url = attempt['lesson_url']
-                if attempt['is_negative']:
-                    result = 'Работа не принята'
-                else:
-                    result = 'Работа принята'
-
-                text = 'Преподаватель проверил работу "{}"! {}. {}'.format(
-                    lesson_title, result, lesson_url
+            try:
+                response = requests.get(
+                    url,
+                    headers=header,
+                    params={'timestamp': timestamp},
                 )
-                bot.send_message(
-                    chat_id=telegram_chat_id,
-                    text=text)
+                response.raise_for_status()
+            except requests.exceptions.ReadTimeout:
+                logger.warning('Истекло время ожидания ответа от сервера')
+                continue
+            except requests.exceptions.ConnectionError:
+                logger.warning('Потеряно соединение')
+                sleep(60)
+                continue
 
-        elif server_message['status'] == 'timeout':
-            timestamp = server_message.get('timestamp_to_request')
+            server_message = response.json()
 
+            if server_message['status'] == 'found':
+                timestamp = server_message.get('last_attempt_timestamp')
+                attempts = server_message['new_attempts']
+
+                for attempt in attempts:
+                    lesson_title = attempt['lesson_title']
+                    lesson_url = attempt['lesson_url']
+                    if attempt['is_negative']:
+                        result = 'Работа не принята'
+                    else:
+                        result = 'Работа принята'
+
+                    text = 'Преподаватель проверил работу "{}"! {}. {}'.format(
+                        lesson_title, result, lesson_url
+                    )
+                    bot.send_message(
+                        chat_id=telegram_chat_id,
+                        text=text)
+
+            elif server_message['status'] == 'timeout':
+                timestamp = server_message.get('timestamp_to_request')
+
+        except Exception as err:
+            msg = f'Бот упал с ошибкой {err}.'
+            logger.exception(msg)
+            sleep(60)
 
 if __name__ == "__main__":
     main()
