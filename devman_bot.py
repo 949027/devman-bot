@@ -79,9 +79,10 @@ def main():
                 timestamp = server_message.get('timestamp_to_request')
 
         except Exception as err:
-            msg = f'Бот упал с ошибкой {err}.'
+            msg = f'Бот упал с ошибкой "{err}".'
             logger.exception(msg)
             sleep(60)
+
 
 if __name__ == "__main__":
     main()
