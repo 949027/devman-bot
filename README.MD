@@ -18,3 +18,4 @@ pip install -r requirements.txt
 python devman_bot.py 
 ```
 Когда преподаватель проверит вашу работу - вы получите результат в Telegram.
+При сбоях в работе бота вы получите сообщение в Telegram. 
