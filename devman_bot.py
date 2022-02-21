@@ -41,20 +41,12 @@ def main():
 
     while True:
         try:
-            try:
-                response = requests.get(
-                    url,
-                    headers=header,
-                    params={'timestamp': timestamp},
-                )
-                response.raise_for_status()
-            except requests.exceptions.ReadTimeout:
-                logger.warning('Истекло время ожидания ответа от сервера')
-                continue
-            except requests.exceptions.ConnectionError:
-                logger.warning('Потеряно соединение')
-                sleep(60)
-                continue
+            response = requests.get(
+                url,
+                headers=header,
+                params={'timestamp': timestamp},
+            )
+            response.raise_for_status()
 
             server_message = response.json()
 
@@ -80,6 +72,13 @@ def main():
             elif server_message['status'] == 'timeout':
                 timestamp = server_message.get('timestamp_to_request')
 
+        except requests.exceptions.ReadTimeout:
+            logger.warning('Истекло время ожидания ответа от сервера')
+            continue
+        except requests.exceptions.ConnectionError:
+            logger.warning('Потеряно соединение')
+            sleep(60)
+            continue
         except Exception as err:
             msg = f'Бот упал с ошибкой "{err}".'
             logger.exception(msg)
