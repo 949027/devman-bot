@@ -7,6 +7,9 @@ import telegram
 import requests
 
 
+logger = logging.getLogger("Телеграм-логер")
+
+
 class MyLogsHandler(logging.Handler):
 
     def __init__(self, tg_bot, chat_id):
@@ -31,7 +34,6 @@ def main():
 
     bot = telegram.Bot(token=telegram_token)
 
-    logger = logging.getLogger("Телеграм-логер")
     logger.setLevel(logging.INFO)
     logger.addHandler(MyLogsHandler(bot, telegram_chat_id))
 
