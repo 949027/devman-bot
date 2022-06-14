@@ -19,3 +19,23 @@ python devman_bot.py
 ```
 Когда преподаватель проверит вашу работу - вы получите результат в Telegram.
 При сбоях в работе бота вы получите сообщение в Telegram. 
+
+### Docker на локальной машине
+1. Установите [Docker](https://docs.docker.com/get-started/).
+
+2. Перейдите в корень проекта и соберите образ командой:
+```commandline
+docker build -t devman-bot .
+```
+3. Запустите контейнер командой:
+```commandline
+docker run -dp 3000:3000 --env-file ./.env devman-bot
+```
+4. В телеграм должно придти сообщение о включении бота. Если этого не случилось, узнайте ID контейнера командой: 
+```commandline
+docker ps -all
+```
+и изучите логи командой:
+```commandline
+docker logs -f <container-id>
+```
